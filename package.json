@@ -1,0 +1,28 @@
+{
+  "name": "todoapp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start" : "node app/server.js",
+    "test": "mocha app/**/*.test.js",
+    "test-watch": "nodemon --exec 'npm test'"
+  },
+  "engines" : {
+    "node" : "6.9.2"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "mongodb": "^2.2.19",
+    "mongoose": "^4.7.6"
+  },
+  "devDependencies": {
+    "expect": "^1.20.2",
+    "mocha": "^3.2.0",
+    "morgan": "^1.7.0",
+    "supertest": "^2.0.1"
+  }
+}
