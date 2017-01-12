@@ -2,6 +2,9 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
+const bcrypt = require('bcryptjs');
+
+
 var Schema = mongoose.Schema;
 
 var TokenSchema = new Schema({
@@ -32,6 +35,23 @@ var UserSchema = new Schema({
     minlength : 6
   },
   tokens : [TokenSchema]
+});
+
+
+// mongoose middleware "before save"
+UserSchema.pre('save', function (next) {
+  var user = this;
+
+  if (user.isModified('password')) {
+    bcrypt.genSalt(10, (err, salt) => {
+      bcrypt.hash(user.password, salt, (err, hashedPassword) => {
+        user.password = hashedPassword;
+        next();
+      })
+    })
+  } else {
+    next();
+  }
 });
 
 // Instance method
