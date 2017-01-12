@@ -1,6 +1,7 @@
-var express = require('express');
-var bodyParser = require('body-parser');
-var morgan = require('morgan');
+const _ = require('lodash');
+const express = require('express');
+const bodyParser = require('body-parser');
+const morgan = require('morgan');
 const {ObjectID} = require('mongodb');
 
 var {mongoose} = require('./database/db');
@@ -81,6 +82,72 @@ app
           .json(e)
       })
   })
+  .delete((req, res) => {
+    var todoId = req.params._id;
+    if (!ObjectID.isValid(todoId)) {
+      res
+        .status(404)
+        .json({
+          message : 'Invalid id',
+          type : 'error'
+        })
+      return;
+    }
+
+    Todo
+      .findOneAndRemove({
+        _id : todoId
+      })
+      .then((doc) => {
+        if (!doc) {
+          res
+            .status(404)
+            .json({ message : 'Todo ' + todoId + ' not found'})
+          return;
+        }
+        // doc.remove();
+        res
+          .status(200)
+          .json({doc})
+      }, (err) => {
+        res
+          .status(400)
+          .json(err);
+      })
+  })
+  .put((req, res) => {
+    var todoId = req.params._id;
+    var body = _.pick(req.body, ['text', 'completed']);
+    if (!ObjectID.isValid(todoId)){
+      return res.status(404).json({
+        message : 'Invalid id',
+        type : 'error'
+      });
+    }
+
+    if (_.isBoolean(body.completed) && body.completed) {
+      body.completedAt = new Date().getTime();
+    } else {
+      body.completed = false;
+      body.completedAt = null;
+    }
+
+    Todo
+      .findByIdAndUpdate(todoId, { $set : body}, { new : true})
+      .then((doc) => {
+        if (!doc) {
+          return res.status(404).json({ message : 'Todo ' + todoId + ' not found'})
+        }
+        res.status(200).json({doc});
+      })
+      .catch((err) => {
+        return res.status(400).json(err)
+      })
+
+
+  });
+
+
 app.listen(port, (e) => {
   if (e) {
     console.log('Whoops something went horribly wrong', e);

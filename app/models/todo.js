@@ -18,6 +18,9 @@ var TodoSchema = new Schema({
   }
 })
 
+TodoSchema.post('remove', function(doc) {
+  console.log('%s has been removed', doc._id);
+});
 
 var Todo = mongoose.model('Todo', TodoSchema);
 
