@@ -18,6 +18,32 @@ app.use(bodyParser.urlencoded({ extended : true }));
 app.use(bodyParser.json());
 
 app
+  .route('/users')
+  .post((req, res) => {
+    var body = _.pick(req.body, ['email', 'password'])
+
+    var user = new User({
+      email : body.email,
+      password : body.password
+    });
+
+    user
+      .save()
+      .then(() => {
+        return user.generateAuthToken();
+      })
+      .then((token) => {
+        res
+          .header('x-auth', token)
+          .json({user})
+      })
+      .catch((err) => {
+        res
+          .status(400)
+          .json(err)
+      })
+  })
+app
   .route('/todos')
   .post((req, res) => {
     var todo = new Todo({
@@ -48,8 +74,6 @@ app
           .json(e);
       })
   })
-
-
 app
   .route('/todos/:_id')
   .get((req, res) => {
