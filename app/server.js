@@ -19,6 +19,28 @@ app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended : true }));
 app.use(bodyParser.json());
 
+
+app
+  .route('/users/login')
+  .post((req, res) => {
+    var body = _.pick(req.body,['email', 'password']);
+    User
+      .findByCredentrials(body.email, body.password)
+      .then((user) => {
+        return user.generateAuthToken().then((token) => {
+          res
+            .header('x-auth', token)
+            .json({user})
+        })
+      })
+      .catch((error) => {
+        res
+          .status(400)
+          .json({error})
+      })
+  });
+
+
 app
   .route('/users')
   .post((req, res) => {
