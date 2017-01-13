@@ -88,9 +88,10 @@ app
 
 app
   .route('/todos')
-  .post((req, res) => {
+  .post(authenticate, (req, res) => {
     var todo = new Todo({
-      text : req.body.text
+      text : req.body.text,
+      _creator : req.user._id
     });
     todo
       .save()
@@ -104,9 +105,10 @@ app
             .json(e);
       })
   })
-  .get((req, res) => {
+  .get(authenticate, (req, res) => {
+
     Todo
-      .find()
+      .find({_creator : req.user._id })
       .then((docs) => {
         res
           .status(200)
@@ -119,7 +121,7 @@ app
   })
 app
   .route('/todos/:_id')
-  .get((req, res) => {
+  .get(authenticate, (req, res) => {
     var todoId = req.params._id;
     if (!ObjectID.isValid(todoId)) {
       res
@@ -133,7 +135,8 @@ app
 
     Todo
       .findOne({
-        _id : todoId
+        _id : todoId,
+        _creator : req.user._id
       })
       .then((doc) => {
         if (!doc) {
@@ -151,7 +154,7 @@ app
           .json(e)
       })
   })
-  .delete((req, res) => {
+  .delete(authenticate, (req, res) => {
     var todoId = req.params._id;
     if (!ObjectID.isValid(todoId)) {
       res
@@ -165,7 +168,8 @@ app
 
     Todo
       .findOneAndRemove({
-        _id : todoId
+        _id : todoId,
+        _creator : req.user._id
       })
       .then((doc) => {
         if (!doc) {
@@ -184,7 +188,7 @@ app
           .json(err);
       })
   })
-  .put((req, res) => {
+  .put(authenticate, (req, res) => {
     var todoId = req.params._id;
     var body = _.pick(req.body, ['text', 'completed']);
     if (!ObjectID.isValid(todoId)){
@@ -202,7 +206,10 @@ app
     }
 
     Todo
-      .findByIdAndUpdate(todoId, { $set : body}, { new : true})
+      .findOneAndUpdate({
+        _id : todoId,
+        _creator : req.user._id
+      }, { $set : body}, { new : true})
       .then((doc) => {
         if (!doc) {
           return res.status(404).json({ message : 'Todo ' + todoId + ' not found'})
