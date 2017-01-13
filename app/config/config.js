@@ -14,3 +14,6 @@ if (env === 'development' || env === 'test') {
 // heroku config:get NAME (get an env variable)
 // heroku config:set NAME=Angel (create an env variable)
 // heroku config:unset NAME (remove an env variable)
+
+
+// heroku config:set JWT_SECRET=superrandomstring
