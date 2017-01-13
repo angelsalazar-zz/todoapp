@@ -40,6 +40,16 @@ app
       })
   });
 
+app
+  .route('/users/me/token')
+  .delete(authenticate, (req, res) => {
+    req.user.removeToken(req.token).then(() => {
+      res.status(200).json();
+    })
+    .catch((err) => {
+      res.status(400).json();
+    })
+  })
 
 app
   .route('/users')
