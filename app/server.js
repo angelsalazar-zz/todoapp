@@ -6,13 +6,13 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const {ObjectID} = require('mongodb');
 
-var {mongoose} = require('./database/db');
-var {Todo} = require('./models/todo');
-var {User} = require('./models/user');
-var {authenticate} = require('./middleware/authenticate');
+const {mongoose} = require('./database/db');
+const {Todo} = require('./models/todo');
+const {User} = require('./models/user');
+const {authenticate} = require('./middleware/authenticate');
 
 
-var app = express();
+const app = express();
 const port = process.env.PORT;
 
 app.use(morgan('dev'));
@@ -23,7 +23,7 @@ app.use(bodyParser.json());
 app
   .route('/users/login')
   .post((req, res) => {
-    var body = _.pick(req.body,['email', 'password']);
+    const body = _.pick(req.body,['email', 'password']);
     User
       .findByCredentrials(body.email, body.password)
       .then((user) => {
@@ -54,9 +54,9 @@ app
 app
   .route('/users')
   .post((req, res) => {
-    var body = _.pick(req.body, ['email', 'password'])
+    const body = _.pick(req.body, ['email', 'password'])
 
-    var user = new User({
+    const user = new User({
       email : body.email,
       password : body.password
     });
@@ -82,14 +82,14 @@ app
 app
   .route('/users/me')
   .get(authenticate, (req, res) => {
-    var {user} = req;
+    const {user} = req;
     res.status(200).json({user})
   })
 
 app
   .route('/todos')
   .post(authenticate, (req, res) => {
-    var todo = new Todo({
+    const todo = new Todo({
       text : req.body.text,
       _creator : req.user._id
     });
@@ -122,7 +122,7 @@ app
 app
   .route('/todos/:_id')
   .get(authenticate, (req, res) => {
-    var todoId = req.params._id;
+    const todoId = req.params._id;
     if (!ObjectID.isValid(todoId)) {
       res
         .status(404)
@@ -155,7 +155,7 @@ app
       })
   })
   .delete(authenticate, (req, res) => {
-    var todoId = req.params._id;
+    const todoId = req.params._id;
     if (!ObjectID.isValid(todoId)) {
       res
         .status(404)
@@ -189,8 +189,8 @@ app
       })
   })
   .put(authenticate, (req, res) => {
-    var todoId = req.params._id;
-    var body = _.pick(req.body, ['text', 'completed']);
+    const todoId = req.params._id;
+    const body = _.pick(req.body, ['text', 'completed']);
     if (!ObjectID.isValid(todoId)){
       return res.status(404).json({
         message : 'Invalid id',
